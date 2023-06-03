@@ -1,0 +1,147 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+
+<body id="root" style="background-color:#fff;">
+  <div style="height:40px; width: 100%; display:flex; flex-wrap:wrap; justify-content: center;">
+    <div id="parent" class="bar">
+      <input type="text" class="srch" placeholder="Stock name" id="name0"><button id=""
+        onclick="this.id = a;calc(this.id);" class="cal">View</button>
+      <p id="p'+ a +'"></p>
+      <p id="cprc'+ a +'"></p>
+    </div>
+  </div>
+  <div id="stc" style="display:flex; flex-wrap:wrap; height:100%;">
+    <script>
+      var a = 0;
+
+      function addD() {
+        var elem = document.createElement('input');
+        var elem2 = document.createElement('canvas');
+        elem.style = 'height:15px;width:15px;padding:0px;font-size:10px;font-weight:bold;cursor:pointer;';
+        elem.type = 'button'; elem.value = 'X'; elem.id = 'close' + a; elem.addEventListener('click', clos);
+        elem2.id = 'myChart' + a;
+        elem2.width = '200';
+        elem2.height = '200';
+        elem2.class = 'charts';
+        elem2.style = 'max-height:250px; max-width:250px; padding-left:10px;';
+        document.getElementById('stc').appendChild(elem2);
+        document.getElementById('stc').appendChild(elem);
+        function clos() {
+          document.removeChild(document.getElementById(elem));
+          console.log();
+        }
+        a += 1;
+      }
+      function calc(n) {
+        // Create a request variable and assign a new XMLHttpRequest object to it.
+        var request = new XMLHttpRequest()
+        var stock = document.getElementById('name0').value;
+        // Open a new connection, using the GET request on the URL endpoint
+        request.open('GET', 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=' + stock + '.BSE&outputsize=full&apikey=FP37N1DWYZTWFI6O', true)
+
+        request.onload = function () {
+          // Begin accessing JSON data here
+          var data = JSON.parse(this.response)
+
+          console.log(data["Time Series (Daily)"]);
+          var meta = data["Meta Data"];
+          var latest = meta["3. Last Refreshed"];
+          var full = data["Time Series (Daily)"];
+          var daily = full[latest];
+          var cpr = daily["4. close"];
+          const dt = []; const pri = [];
+          var i = 0;
+          for (let x in data["Time Series (Daily)"]) {
+            dt[i] = x;
+            var s = full[x];
+            pri[i] = s["4. close"];
+            i++;
+          }
+
+          console.log(latest);
+          addD();
+          const ctx = document.getElementById('myChart' + n).getContext('2d');
+          const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              datasets: [{
+                data: [{x: dt[21], y: pri[21]}, {x: dt[20], y: pri[20]}, {x: dt[19], y: pri[19]}, {x: dt[18], y: pri[18]}, {x: dt[17], y: pri[17]}, {x: dt[16], y: pri[16]}, {x: dt[15], y: pri[15]}, {x: dt[14], y: pri[14]}, {x: dt[13], y: pri[13]}, {x: dt[12], y: pri[12]}, {x: dt[11], y: pri[11]}, {x: dt[10], y: pri[10]}, {x: dt[9], y: pri[9]}, {x: dt[8], y: pri[8]}, {x: dt[7], y: pri[7]}, {x: dt[6], y: pri[6]}, {x: dt[5], y: pri[5]}, {x: dt[4], y: pri[4]}, {x: dt[3], y: pri[3]}, {x: dt[2], y: pri[2]}, {x: dt[1], y: pri[1]}, {x: dt[0], y: pri[0]}],
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgb(255, 99, 132)',
+                label: stock
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: false
+                }
+              }
+            }
+          });
+        }
+        // Send request
+        request.send()
+      }
+    </script>
+    <p id="dta"></p>
+    <style>
+      .bar {
+        background-color: #000;
+        border-radius: 19px;
+        max-height: 30px;
+        width: 230px;
+        padding: 2px 2px 2px 2px;
+        color: #ffffffeb;
+        margin-bottom: 6px;
+        position: fixed;
+        top: 8px;
+      }
+
+      .srch {
+        background-color: #ffffff;
+        color: #000;
+        border-radius: 17px 0 0 17px;
+        border-width: 0px;
+        margin: 0px;
+        font-size: 14px;
+        height: 30px;
+        padding: 0 0 0 50px;
+        min-width: 180px;
+        max-width: 180px;
+      }
+
+      .inp {
+        background-color: #ffffff;
+        color: #000;
+        border-radius: 9px;
+        border-width: 0px;
+        margin-bottom: 6px;
+        font-size: 14px;
+        height: 25px;
+        padding: 0 12px;
+        max-width: 175px;
+      }
+
+      .cal {
+        background-color: #0071e3;
+        color: #ffffff;
+        border-radius: 0 17px 17px 0;
+        border-width: 0px;
+        cursor: pointer;
+        height: 30px;
+        margin: 0px;
+        padding: 0;
+        min-width: 50px;
+        font-size: 14px;
+      }
+    </style>
+  </div>
+</body>
+
+</html>
